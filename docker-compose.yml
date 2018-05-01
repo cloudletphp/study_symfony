@@ -1,0 +1,41 @@
+version: '2'
+
+services:
+    data:
+        image: busybox
+        container_name: study_data
+        restart: always
+        volumes:
+            - "./:/var/www/html"
+
+    server:
+        build: docker/nginx
+        container_name: study_server
+        restart: always
+        ports:
+            - "80:80"
+        volumes_from:
+            - data
+        links:
+            - php
+
+    php:
+        build: docker/php
+        container_name: study_php
+        restart: always
+        volumes_from:
+            - data
+
+    database:
+        image: mariadb:latest
+        container_name: study_database
+        restart: always
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: study
+            MYSQL_USER: docker
+            MYSQL_PASSWORD: docker
+        volumes_from:
+            - data
